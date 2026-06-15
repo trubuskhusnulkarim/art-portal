@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trubus Atelier - Artwork Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="portal-container">
+        <h1>TRUBUS ATELIER</h1>
+        <p class="subtitle">Digital Artwork Companion</p>
+        
+        <hr class="divider">
+
+        <div class="input-section">
+            <p class="instruction">Masukkan kode unik yang tertera di bawah bingkai lukisan untuk melihat cerita di balik karyanya.</p>
+            
+            <input type="text" id="artworkCode" placeholder="Contoh: LND01" autocomplete="off">
+            <button onclick="redirectToArtwork()">Buka Cerita</button>
+            
+            <p id="errorMessage" class="error-msg"></p>
+        </div>
+    </div>
+
+    <script>
+        function redirectToArtwork() {
+            // Ambil input dari user dan ubah ke huruf besar semua (biar gak sensitif caps lock)
+            const inputCode = document.getElementById('artworkCode').value.trim().toUpperCase();
+            const errorElement = document.getElementById('errorMessage');
+            
+            if (inputCode === "") {
+                errorElement.innerText = "Kodenya diisi dulu ya...";
+                return;
+            }
+
+            // Ambil data dari database.json
+            fetch('database.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Gagal memuat database.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Cek apakah kode ada di dalam database
+                    if (data[inputCode]) {
+                        errorElement.innerText = "Kode cocok! Mengalihkan...";
+                        errorElement.style.color = "#4CAF50";
+                        
+                        // Redirect ke link Instagram yang cocok
+                        window.location.href = data[inputCode];
+                    } else {
+                        // Jika kode tidak ditemukan
+                        errorElement.innerText = "Ups! Kode tidak ditemukan. Coba periksa kembali tulisan di bawah bingkai.";
+                        errorElement.style.color = "#ff4d4d";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    errorElement.innerText = "Terjadi kesalahan sistem, coba lagi nanti.";
+                });
+        }
+    </script>
+</body>
+</html>
